@@ -1,5 +1,5 @@
 // Modified script.js with complete API integration
-const API_URL = 'http://localhost:3000/api';
+const API_URL = '/api';
 
 // Initialize arrays to store group members and expenses
 let members = [];
