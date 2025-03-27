@@ -229,12 +229,11 @@ app.get('/api/trips/:urlId', (req, res) => {
 });
 
 app.post('/api/trips', (req, res) => {
-  const { name, description, start_date, end_date } = req.body;
+  const { name, description, currency, start_date, end_date } = req.body;
   const urlId = generateUniqueId();
-
   connection.query(
-    'INSERT INTO trips (name, description, start_date, end_date, url_id) VALUES (?, ?, ?, ?, ?)',
-    [name, description, start_date, end_date, urlId],
+    'INSERT INTO trips (name, description, trip_currency, start_date, end_date, url_id) VALUES (?, ?, ?, ?, ?, ?)',
+    [name, description, currency, start_date, end_date, urlId],
     (err, result) => {
       if (err) return res.status(500).json({ error: err.message });
       res.status(201).json({ id: result.insertId, url_id: urlId });
@@ -262,11 +261,10 @@ app.get('/api/trips/:tripId/expenses', (req, res) => {
 // Update a trip
 app.put('/api/trips/:id', (req, res) => {
   const tripId = req.params.id;
-  const { name, description, start_date, end_date } = req.body;
-  
+  const { name, description, currency, start_date, end_date } = req.body;
   connection.query(
-    'UPDATE trips SET name = ?, description = ?, start_date = ?, end_date = ? WHERE id = ?',
-    [name, description, start_date, end_date, tripId],
+    'UPDATE trips SET name = ?, description = ?, trip_currency = ?, start_date = ?, end_date = ? WHERE id = ?',
+    [name, description, currency, start_date, end_date, tripId],
     (err, result) => {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ message: 'Trip updated successfully' });
