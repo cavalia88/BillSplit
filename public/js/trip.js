@@ -850,23 +850,6 @@ function openEditForm(expenseId) {
 
 
 
-
-// Show unequal split inputs in edit form
-function showEditUnequalSplitInputs(expense) {
-    editUnequalSplitContainer.innerHTML = '';
-    editUnequalSplitContainer.classList.remove('hidden');
-
-    expense.participants.forEach(participant => {
-        const div = document.createElement('div');
-        div.className = 'form-group';
-        div.innerHTML = `
-            <label for="edit-share-${participant}">${participant}'s Share:</label>
-            <input type="number" id="edit-share-${participant}" value="${expense.shares[participant]}" step="0.01" min="0">
-        `;
-        editUnequalSplitContainer.appendChild(div);
-    });
-}
-
 // Submit edited expense via API
 async function submitEditExpense(e) {
     e.preventDefault();
@@ -2450,19 +2433,18 @@ closeEditExpenseModal.addEventListener("click", () => {
     editExpenseModal.classList.add("hidden");
 });
 
-//Add an event listener for split type changes
+// Add event listener for split type changes
 document.getElementById('edit-split-type').addEventListener('change', function() {
+  const expenseId = document.getElementById('edit-expense-id').value;
+  const expense = expenses.find(e => e.id === Number(expenseId));
   if (this.value === 'unequal') {
-    showEditUnequalSplitInputs(expenses.find(e => e.id === Number(editExpenseId.value)));
+    showEditUnequalSplitInputs(expense);
   } else {
     document.getElementById('edit-unequal-split-container').classList.add('hidden');
   }
 });
 
-
-
-
-//Add Event Listener for Split Type Changes
+// Add Event Listener for Split Type Changes
 document.getElementById('edit-split-type').addEventListener('change', handleEditSplitTypeChange);
 
 function handleEditSplitTypeChange() {
@@ -2470,19 +2452,20 @@ function handleEditSplitTypeChange() {
   const unequalSplitContainer = document.getElementById('edit-unequal-split-container');
   
   if (splitType === 'unequal') {
-    showEditUnequalSplitInputs();
+    const expenseId = document.getElementById('edit-expense-id').value;
+    const expense = expenses.find(e => e.id === Number(expenseId));
+    showEditUnequalSplitInputs(expense);
   } else {
     unequalSplitContainer.classList.add('hidden');
     unequalSplitContainer.innerHTML = '';
   }
 }
 
-function showEditUnequalSplitInputs() {
+function showEditUnequalSplitInputs(expense) {
   const unequalSplitContainer = document.getElementById('edit-unequal-split-container');
   unequalSplitContainer.innerHTML = '';
   unequalSplitContainer.classList.remove('hidden');
   
-  const amount = parseFloat(document.getElementById('edit-expense-amount').value) || 0;
   const checkedParticipants = Array.from(
     document.getElementById('edit-expense-participants').querySelectorAll('input[type="checkbox"]:checked')
   ).map(checkbox => checkbox.value);
@@ -2493,19 +2476,19 @@ function showEditUnequalSplitInputs() {
     return;
   }
   
-  const equalShare = amount / checkedParticipants.length;
-  
   checkedParticipants.forEach(participant => {
+    const share = expense.shares[participant] || 0;
     const div = document.createElement('div');
     div.className = 'form-group';
     div.innerHTML = `
       <label for="edit-share-${participant}">${participant}'s share:</label>
       <input type="number" id="edit-share-${participant}" name="share-${participant}" 
-        value="${equalShare.toFixed(2)}" step="0.01">
+        value="${share.toFixed(2)}" step="0.01">
     `;
     unequalSplitContainer.appendChild(div);
   });
 }
+
 
 
 
